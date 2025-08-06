@@ -4,21 +4,24 @@ namespace App\Ticket;
 
 use App\Events\UpdateTicket;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\Auth;
 
 class ResolveTicket
 {
-    public function __construct(private readonly ?Ticket $ticket = null)
+    public function __construct(private ?Ticket $ticket = null)
     {
         if (!$this->ticket) {
-            $this->ticket_id = Ticket::orderBy('created_at', 'desc')->first()->id;
-        } else {
-            $this->ticket_id = $this->ticket->id;
+            $this->ticket = Ticket::orderBy('created_at', 'desc')->first();
         }
         $this->action();
     }
 
     public function action(): void
     {
-        event(new UpdateTicket($this->ticket_id));
+        if (Auth::user()->role === 1) {
+            event(new UpdateTicket($this->ticket));
+        } else {
+            abort(403); // unauthorised
+        }
     }
 }

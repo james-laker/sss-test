@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Events\UpdateTicket;
+use App\Models\User;
 use App\Ticket\ResolveTicket;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateTicketCommand extends Command
 {
@@ -27,6 +29,15 @@ class UpdateTicketCommand extends Command
      */
     public function handle()
     {
-        new ResolveTicket();
+        $user = User::where('role', 1)->first();
+
+        if ($user) {
+            Auth::login($user);
+
+            new ResolveTicket();
+
+            Auth::logout();
+        }
+
     }
 }

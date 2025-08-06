@@ -22,7 +22,6 @@ class ResolveTicketListener
      */
     public function handle(UpdateTicket $event): void
     {
-        $ticket = Ticket::find($event->ticket_id);
-        $ticket->update(['status' => 1]);
+        $event->ticket->update(['status' => 1]);
     }
 }
