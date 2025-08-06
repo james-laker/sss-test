@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Ticket;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -17,7 +18,7 @@ class UpdateTicket implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public int $ticket_id) // pass through ticket ID so we can use this to resolve the ticket
+    public function __construct(public Ticket $ticket)
     {
         //
     }
@@ -37,12 +38,11 @@ class UpdateTicket implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'ticket_id' => $this->ticket_id,
+            'ticket_id' => $this->ticket->id,
+            'subject' => $this->ticket->subject,
+            'content' => $this->ticket->content,
+            'status' => $this->ticket->status,
+            'user' => $this->ticket->user->full_name
         ];
-    }
-
-    public function broadcastAs()
-    {
-        return 'update-ticket';
     }
 }
