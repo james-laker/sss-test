@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
          $schedule->command('ticket:create')->everyMinute();
          $schedule->command('ticket:update')->everyFiveMinutes();
+         $schedule->command('ticket:summary')->daily();
     }
 
     /**
