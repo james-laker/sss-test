@@ -7,10 +7,17 @@ import {
     Link,
 } from "react-router-dom";
 
-import Dashboard from "./views/Dashboard.jsx";
-import Reports from "./views/Reports.jsx";
+import Login from "./views/Login.jsx";
+import OpenTickets from "./views/OpenTickets.jsx";
+import ClosedTickets from "./views/ClosedTickets.jsx";
+import UserTickets from "./views/UserTickets.jsx";
 
 const appName = import.meta.env.VITE_APP_NAME;
+
+const logout = () => {
+    localStorage.removeItem('token');
+    location.href = '/login'
+};
 
 function App() {
     return (
@@ -22,7 +29,13 @@ function App() {
                     <div className="collapse navbar-collapse">
                         <ul className="navbar-nav">
                             <li className="nav-item">
-                                <Link className="nav-link" to="/">Dashboard</Link>
+                                <Link className="nav-link" to="/open">Open Tickets</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/closed">Closed Tickets</Link>
+                            </li>
+                            <li className="nav-item">
+                                <button className="nav-link" onClick={logout}>Logout</button>
                             </li>
                         </ul>
                     </div>
@@ -32,7 +45,10 @@ function App() {
             <div>
                 <div className="container mt-4">
                     <Routes>
-                        <Route path='/' element={<Dashboard />} />
+                        <Route path='/open' element={<OpenTickets />} />
+                        <Route path='/closed' element={<ClosedTickets />} />
+                        <Route path='/:email/tickets' element={<UserTickets />} />
+                        <Route path='/login' element={<Login />} />
                     </Routes>
                 </div>
             </div>
