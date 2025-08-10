@@ -1,7 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\StatsController;
+use App\Http\Controllers\TicketsController;
+use App\Http\Controllers\UserTicketsController;
+use App\Http\Resources\TicketResource;
+use App\Models\Ticket;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +20,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+Route::post('/login', LoginController::class);
+
+Route::middleware('auth:sanctum')->get('/open', [TicketsController::class, 'open']);
+Route::middleware('auth:sanctum')->get('/closed', [TicketsController::class, 'closed']);
+Route::middleware('auth:sanctum')->get('/users/{email}/tickets', UserTicketsController::class);
+Route::middleware('auth:sanctum')->get('/stats', StatsController::class);
+
+

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\TicketResource;
 use App\Models\Ticket;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -37,12 +38,6 @@ class UpdateTicket implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return [
-            'ticket_id' => $this->ticket->id,
-            'subject' => $this->ticket->subject,
-            'content' => $this->ticket->content,
-            'status' => $this->ticket->status,
-            'user' => $this->ticket->user->full_name
-        ];
+        return (new TicketResource($this->ticket))->resolve();
     }
 }

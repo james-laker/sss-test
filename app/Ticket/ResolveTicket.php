@@ -11,7 +11,7 @@ class ResolveTicket
     public function __construct(private ?Ticket $ticket = null)
     {
         if (!$this->ticket) {
-            $this->ticket = Ticket::orderBy('created_at', 'desc')->first();
+            $this->ticket = Ticket::where('status', false)->orderBy('created_at', 'asc')->first();
         }
         $this->action();
     }
