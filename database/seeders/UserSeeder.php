@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create(['role' => 1]); // make sure at least 1 admin user is created
+        User::factory()->create(['role' => 1, 'password' => 'cbxTEST']); // make sure at least 1 admin user is created
         User::factory()->count(9)->create();
     }
 }
