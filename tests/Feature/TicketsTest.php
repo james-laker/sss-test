@@ -12,21 +12,21 @@ beforeEach(function () {
 });
 
 it('returns open tickets', function () {
-    Ticket::factory()->count(3)->create(['status' => false]);
-    Ticket::factory()->count(2)->create(['status' => true]);
+    Ticket::factory()->count(2)->create(['status' => false]);
+    Ticket::factory()->count(1)->create(['status' => true]);
 
     $response = $this->getJson('/api/open');
 
     $response->assertStatus(200)
-        ->assertJsonCount(3, 'data');
+        ->assertJsonCount(2, 'data');
 });
 
 it('returns closed tickets', function () {
-    Ticket::factory()->count(4)->create(['status' => true]);
+    Ticket::factory()->count(2)->create(['status' => true]);
     Ticket::factory()->count(1)->create(['status' => false]);
 
     $response = $this->getJson('/api/closed');
 
     $response->assertStatus(200)
-        ->assertJsonCount(4, 'data');
+        ->assertJsonCount(2, 'data');
 });
