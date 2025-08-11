@@ -1,60 +1,78 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from "axios";
 import Table from "../components/Table.jsx";
 import Echo from '../echo.js';
 
 export default function OpenTickets() {
-    let [data, setData] = useState([]);
+    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 3;
+    const [totalPages, setTotalPages] = useState(1);
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-        axios.get(import.meta.env.VITE_API_URL + '/open', {
+    const fetchData = useCallback((page) => {
+        axios.get(`${import.meta.env.VITE_API_URL}/open?page=${page}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json',
             },
         })
             .then((response) => {
-                setData(response.data.data)
+                const { data: items } = response.data;
+                setData(items || []);
+                setCurrentPage(response.data.meta.current_page);
+                setTotalPages(response.data.meta.last_page);
             })
             .catch((err) => console.error('API error', err));
-    }, []);
+    }, [token]);
+
+    useEffect(() => {
+        fetchData(currentPage);
+    }, [currentPage, fetchData]);
 
     useEffect(() => {
         const createChannel = Echo.private('create-ticket');
         const resolvedChannel = Echo.private('update-ticket');
 
-        createChannel.listen('CreateTicket', (ticket) => {
-            setData(prev => [...prev, ticket]);
+        createChannel.listen('CreateTicket', () => {
+            fetchData(currentPage);
         });
 
-        resolvedChannel.listen('UpdateTicket', (ticket) => {
-            setData(prev => prev.filter(t => t.ID !== ticket.ID));
+        resolvedChannel.listen('UpdateTicket', () => {
+            fetchData(currentPage);
         });
 
         return () => {
             createChannel.stopListening('CreateTicket');
             resolvedChannel.stopListening('UpdateTicket');
         };
-    }, []);
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+    }, [fetchData, currentPage]);
 
     return (
         <div>
             <h2 className="text-center">Open Tickets</h2>
-            <Table data={currentItems} />
+            <Table data={data} />
+
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                <button className='btn btn-secondary' disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>Previous</button>
+                <button
+                    className="btn btn-secondary"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => prev - 1)}
+                >
+                    Previous
+                </button>
+
                 <span style={{ margin: '0 10px' }}>
-                    Page {currentPage} of {Math.ceil(data.length / itemsPerPage)}
+                    Page {currentPage} of {totalPages}
                 </span>
-                <button className='btn btn-secondary' disabled={currentPage === Math.ceil(data.length / itemsPerPage)} onClick={() => setCurrentPage(prev => prev + 1)}>Next</button>
+
+                <button
+                    className="btn btn-secondary"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                    Next
+                </button>
             </div>
         </div>
     );
